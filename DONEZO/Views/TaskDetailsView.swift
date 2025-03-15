@@ -1,17 +1,24 @@
 import SwiftUI
+import CoreData
 
 struct TaskDetailsView: View {
-    let task: Task // Receive task from HomeScreenView
-    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) var dismiss
+
+    let task: Task
+    @Binding var needsRefresh: Bool
+
     var body: some View {
         ZStack {
-            // Background Gradient
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                           startPoint: .top,
-                           endPoint: .bottom)
-                .ignoresSafeArea()
+            LinearGradient(
+                gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 20) {
+                
                 // Title Section
                 Text("Task Details")
                     .font(.largeTitle)
@@ -19,7 +26,7 @@ struct TaskDetailsView: View {
                     .foregroundColor(.white)
                 
                 // Task Name
-                Text(task.title)
+                Text(task.title ?? "Untitled Task")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
@@ -29,23 +36,24 @@ struct TaskDetailsView: View {
                 HStack {
                     Image(systemName: "calendar")
                         .foregroundColor(.gray)
-                    Text("Due: \(task.dueDate)")
+                    Text("Due: \((task.dueDate ?? Date()).formatted(date: .long, time: .omitted))")
                         .foregroundColor(.gray)
                 }
                 
                 // Priority Badge
-                Text(task.priority)
+                Text(task.priority ?? "Unknown")
                     .font(.subheadline)
                     .padding()
-                    .background(priorityColor(task.priority))
+                    .background(priorityColor(task.priority ?? "Unknown"))
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
+                // Description Section
                 Text("Description")
                     .font(.headline)
                     .foregroundColor(.gray)
                 
-                Text(task.description)
+                Text(task.taskDescription ?? "No description provided.")
                     .font(.body)
                     .foregroundColor(.white)
                     .padding()
@@ -56,19 +64,17 @@ struct TaskDetailsView: View {
                 
                 // Edit & Delete Buttons
                 HStack {
-                    Button(action: {
-                        print("Edit Task")
-                    }) {
+                    NavigationLink(destination: CreateTaskView(task: task, needsRefresh: $needsRefresh)) {
                         Text("Edit Task")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.white.opacity(0.2))
+                            .background(Color(UIColor.systemGray4))
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
                     
                     Button(action: {
-                        print("Delete Task")
+                        deleteTask()
                     }) {
                         Text("Delete Task")
                             .frame(maxWidth: .infinity)
@@ -83,12 +89,22 @@ struct TaskDetailsView: View {
         }
     }
     
-    // Priority Color Function (Matches Home Screen)
+    private func deleteTask() {
+        viewContext.delete(task)
+        do {
+            try viewContext.save()
+            needsRefresh.toggle()
+            dismiss()
+        } catch {
+            print("❌ Error deleting task: \(error.localizedDescription)")
+        }
+    }
+    
     func priorityColor(_ priority: String) -> Color {
         switch priority {
-        case "High": return Color(red: 1.0, green: 59/255, blue: 48/255).opacity(0.2)
-        case "Medium": return Color(red: 1.0, green: 214/255, blue: 10/255).opacity(0.2)
-        case "Low": return Color(red: 48/255, green: 209/255, blue: 88/255).opacity(0.2)
+        case "High": return Color.red.opacity(0.2)
+        case "Medium": return Color.yellow.opacity(0.2)
+        case "Low": return Color.green.opacity(0.2)
         default: return Color.gray.opacity(0.2)
         }
     }
