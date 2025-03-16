@@ -4,6 +4,7 @@ struct HomeScreenView: View {
 
     @State private var selectedFilter: String = "All"
     @State private var selectedSort: String = "Due Date"
+<<<<<<< HEAD
     @State private var needsRefresh: Bool = false
     @State private var refreshID = UUID()
     @State private var violinTilt: Double = -10
@@ -241,10 +242,70 @@ struct TaskRow: View {
         case "Medium": return Color.yellow.opacity(0.33)
         case "Low": return Color.green.opacity(0.33)
         default: return Color.gray.opacity(0.2)
+=======
+
+    // Static tasks (No Core Data)
+    @State private var tasks = [
+        Task(title: "Design System Update", dueDate: "Mar 15, 2025", priority: "High"),
+        Task(title: "Team Meeting", dueDate: "Mar 16, 2025", priority: "Medium"),
+        Task(title: "Project Review", dueDate: "Mar 18, 2025", priority: "Low")
+    ]
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                HStack {
+                    Text("Your Tasks")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+
+                    Spacer()
+
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.gray)
+                    }
+                }
+
+                // Sorting Picker
+                Picker("Sort by", selection: $selectedSort) {
+                    Text("Due Date").tag("Due Date")
+                    Text("Priority").tag("Priority")
+                    Text("Title").tag("Title")
+                }
+                .pickerStyle(.segmented)
+                .padding(.vertical, 10)
+
+                // Filters
+                HStack {
+                    FilterButton(title: "All", isActive: selectedFilter == "All") { selectedFilter = "All" }
+                    FilterButton(title: "Completed", isActive: selectedFilter == "Completed") { selectedFilter = "Completed" }
+                    FilterButton(title: "Pending", isActive: selectedFilter == "Pending") { selectedFilter = "Pending" }
+                }
+                .padding(.vertical, 10)
+
+                // Task List
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(tasks, id: \.id) { task in
+                            TaskRow(task: task)
+                        }
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal)
+            .background(Color.black.ignoresSafeArea())
+>>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
         }
     }
 }
 
+<<<<<<< HEAD
 // MARK: - Filter Button View
 struct FilterButton: View {
     let title: String
@@ -264,4 +325,12 @@ struct FilterButton: View {
                 .animation(.easeInOut(duration: 0.2), value: isActive)
         }
     }
+=======
+// Dummy Task Model (No Core Data)
+struct Task: Identifiable {
+    let id = UUID()
+    let title: String
+    let dueDate: String
+    let priority: String
+>>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
 }
