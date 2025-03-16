@@ -1,17 +1,19 @@
 import SwiftUI
 
 struct TaskDetailsView: View {
-    let task: Task // Receive task from HomeScreenView
-    
+    let task: Task // Static Task Model (No Core Data)
+
     var body: some View {
         ZStack {
-            // Background Gradient
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                           startPoint: .top,
-                           endPoint: .bottom)
-                .ignoresSafeArea()
+            LinearGradient(
+                gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 20) {
+                
                 // Title Section
                 Text("Task Details")
                     .font(.largeTitle)
@@ -41,11 +43,12 @@ struct TaskDetailsView: View {
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
+                // Description Section (Placeholder)
                 Text("Description")
                     .font(.headline)
                     .foregroundColor(.gray)
                 
-                Text(task.description)
+                Text("This is a placeholder description. In a real implementation, task details would be fetched from Core Data.")
                     .font(.body)
                     .foregroundColor(.white)
                     .padding()
@@ -53,42 +56,17 @@ struct TaskDetailsView: View {
                     .cornerRadius(10)
                 
                 Spacer()
-                
-                // Edit & Delete Buttons
-                HStack {
-                    Button(action: {
-                        print("Edit Task")
-                    }) {
-                        Text("Edit Task")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white.opacity(0.2))
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                    
-                    Button(action: {
-                        print("Delete Task")
-                    }) {
-                        Text("Delete Task")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
             }
             .padding(.horizontal)
         }
     }
     
-    // Priority Color Function (Matches Home Screen)
+    // Priority Color Helper
     func priorityColor(_ priority: String) -> Color {
         switch priority {
-        case "High": return Color(red: 1.0, green: 59/255, blue: 48/255).opacity(0.2)
-        case "Medium": return Color(red: 1.0, green: 214/255, blue: 10/255).opacity(0.2)
-        case "Low": return Color(red: 48/255, green: 209/255, blue: 88/255).opacity(0.2)
+        case "High": return Color.red.opacity(0.2)
+        case "Medium": return Color.yellow.opacity(0.2)
+        case "Low": return Color.green.opacity(0.2)
         default: return Color.gray.opacity(0.2)
         }
     }
