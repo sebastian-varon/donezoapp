@@ -2,21 +2,11 @@ import SwiftUI
 import CoreData
 
 struct TaskDetailsView: View {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    let task: Task // Static Task Model (No Core Data)
-=======
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
 
     let task: Task
     @Binding var needsRefresh: Bool
-<<<<<<< HEAD
-=======
->>>>>>> 9ff523ab0549bd215f78e795c50798b54da4569f
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
 
     var body: some View {
         ZStack {
@@ -58,28 +48,12 @@ struct TaskDetailsView: View {
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
-<<<<<<< HEAD
                 // Description Section
-=======
-<<<<<<< HEAD
-                // Description Section (Placeholder)
-=======
-                // Description Section
->>>>>>> 9ff523ab0549bd215f78e795c50798b54da4569f
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                 Text("Description")
                     .font(.headline)
                     .foregroundColor(.gray)
                 
-<<<<<<< HEAD
                 Text(task.taskDescription ?? "No description provided.")
-=======
-<<<<<<< HEAD
-                Text("This is a placeholder description. In a real implementation, task details would be fetched from Core Data.")
-=======
-                Text(task.taskDescription ?? "No description provided.")
->>>>>>> 9ff523ab0549bd215f78e795c50798b54da4569f
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                     .font(.body)
                     .foregroundColor(.white)
                     .padding()
@@ -87,11 +61,6 @@ struct TaskDetailsView: View {
                     .cornerRadius(10)
                 
                 Spacer()
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                 
                 // Edit & Delete Buttons
                 HStack {
@@ -115,21 +84,11 @@ struct TaskDetailsView: View {
                             .cornerRadius(10)
                     }
                 }
-<<<<<<< HEAD
-=======
->>>>>>> 9ff523ab0549bd215f78e795c50798b54da4569f
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
             }
             .padding(.horizontal)
         }
     }
     
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    // Priority Color Helper
-=======
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
     private func deleteTask() {
         viewContext.delete(task)
         do {
@@ -141,10 +100,6 @@ struct TaskDetailsView: View {
         }
     }
     
-<<<<<<< HEAD
-=======
->>>>>>> 9ff523ab0549bd215f78e795c50798b54da4569f
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
     func priorityColor(_ priority: String) -> Color {
         switch priority {
         case "High": return Color.red.opacity(0.2)

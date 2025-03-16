@@ -1,5 +1,4 @@
 import SwiftUI
-<<<<<<< HEAD
 import CoreData
 
 struct CreateTaskView: View {
@@ -25,30 +24,13 @@ struct CreateTaskView: View {
         _priority = State(initialValue: task?.priority ?? "Medium")
     }
 
-=======
-
-struct CreateTaskView: View {
-    @Environment(\.dismiss) var dismiss
-
-    @State private var title: String = ""
-    @State private var description: String = ""
-    @State private var dueDate = Date()
-    @State private var priority: String = "Medium"
-
-    let priorities = ["Low", "Medium", "High"]
-
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
 
                     // Page Title
-<<<<<<< HEAD
                     Text(existingTask == nil ? "Create Task" : "Edit Task")
-=======
-                    Text("Create Task")
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -69,11 +51,7 @@ struct CreateTaskView: View {
                     // Save & Cancel Buttons
                     HStack {
                         CancelButton(action: { dismiss() })
-<<<<<<< HEAD
                         SaveButton(action: saveTask)
-=======
-                        SaveButton(action: { dismiss() }) // No Core Data, just UI
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                     }
                 }
                 .padding(.horizontal)
@@ -89,7 +67,6 @@ struct CreateTaskView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
     }
-<<<<<<< HEAD
 
     private func saveTask() {
         guard !title.isEmpty else {
@@ -117,8 +94,6 @@ struct CreateTaskView: View {
             print("❌ Error saving task: \(error.localizedDescription)")
         }
     }
-=======
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
 }
 
 // MARK: - Subviews
@@ -209,11 +184,7 @@ struct SaveButton: View {
 
     var body: some View {
         Button(action: action) {
-<<<<<<< HEAD
             Text("Save Task")
-=======
-            Text("Save Task") // Just UI, no Core Data
->>>>>>> 1cc87e0bcf71153207ad8694e0292ed8cbf587cc
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.blue)
