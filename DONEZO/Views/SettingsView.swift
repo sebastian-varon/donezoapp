@@ -1,15 +1,13 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.colorScheme) var colorScheme
     @State private var notificationsEnabled = true
-    @State private var darkModeEnabled = true
-    
+    @AppStorage("isDarkMode") private var darkModeEnabled = true
+
     var body: some View {
         ZStack {
-            // Background Gradient
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                           startPoint: .top,
-                           endPoint: .bottom)
+            Color.background(for: colorScheme)
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 20) {
@@ -17,30 +15,30 @@ struct SettingsView: View {
                 Text("Settings")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                 
                 // Notification Toggle
-                SettingsToggle(title: "Enable Notifications", isOn: $notificationsEnabled)
+                SettingsToggle(title: "Enable Notifications", isOn: $notificationsEnabled, colorScheme: colorScheme)
                 
                 // Dark Mode Toggle
-                SettingsToggle(title: "Enable Dark Mode", isOn: $darkModeEnabled)
+                SettingsToggle(title: "Enable Dark Mode", isOn: $darkModeEnabled, colorScheme: colorScheme)
                 
                 // About Section
                 VStack(alignment: .leading, spacing: 10) {
                     Text("About")
                         .font(.headline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
                     
                     Text("Donezo is a modern and minimalistic task management app designed to help you stay productive and focus on what really matters. Built with SwiftUI by:")
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.primaryText(for: colorScheme))
                         .font(.body)
                     
                     Text("Anthony Aristy, Nikola Varicak & Sebastian Varon")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
                         .font(.subheadline)
                 }
                 .padding()
-                .background(Color.white.opacity(0.1))
+                .background(Color.card(for: colorScheme))
                 .cornerRadius(10)
                 
                 Spacer()
@@ -54,11 +52,12 @@ struct SettingsView: View {
 struct SettingsToggle: View {
     let title: String
     @Binding var isOn: Bool
-    
+    var colorScheme: ColorScheme
+
     var body: some View {
         HStack {
             Text(title)
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
             
             Spacer()
             
@@ -66,7 +65,7 @@ struct SettingsToggle: View {
                 .toggleStyle(SwitchToggleStyle(tint: .blue))
         }
         .padding()
-        .background(Color.white.opacity(0.1))
+        .background(Color.card(for: colorScheme))
         .cornerRadius(10)
     }
 }
