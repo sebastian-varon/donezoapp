@@ -84,7 +84,12 @@ struct CreateTaskView: View {
                 }
                 .padding(.horizontal)
             }
+<<<<<<< HEAD
             .background(Color.background(for: colorScheme))
+=======
+            Color.background(for: colorScheme)
+                .ignoresSafeArea()
+>>>>>>> 511acb557681dd40e831db4746471ebb931aa903
             .navigationBarTitleDisplayMode(.inline)
         }
     }
