@@ -4,14 +4,23 @@ import CoreData
 struct CreateTaskView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.colorScheme) var colorScheme
 
     var existingTask: Task?
     @Binding var needsRefresh: Bool
 
+    // Read the global toggle from AppStorage
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = true
+
+    // Existing fields
     @State private var title: String
     @State private var description: String
     @State private var dueDate: Date
     @State private var priority: String
+
+    // New fields for reminder
+    @State private var hasReminder: Bool
+    @State private var reminderDate: Date
 
     let priorities = ["Low", "Medium", "High"]
 
@@ -22,18 +31,21 @@ struct CreateTaskView: View {
         _description = State(initialValue: task?.taskDescription ?? "")
         _dueDate = State(initialValue: task?.dueDate ?? Date())
         _priority = State(initialValue: task?.priority ?? "Medium")
+
+        // Load from the existing task if editing; else defaults
+        _hasReminder = State(initialValue: task?.hasReminder ?? false)
+        _reminderDate = State(initialValue: task?.reminderDate ?? Date())
     }
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-
                     // Page Title
                     Text(existingTask == nil ? "Create Task" : "Edit Task")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.primaryText(for: colorScheme))
                         .padding(.top, 20)
 
                     // Input Fields
@@ -46,6 +58,22 @@ struct CreateTaskView: View {
                     // Priority Selector
                     PrioritySelector(priority: $priority, priorities: priorities)
 
+                    // Reminder Toggle
+                    Toggle("Set a Reminder?", isOn: $hasReminder)
+                        .foregroundColor(Color.primaryText(for: colorScheme))
+
+                    // Show a DatePicker only if user wants a reminder
+                    if hasReminder {
+                        DatePicker("Reminder Date & Time",
+                                   selection: $reminderDate,
+                                   displayedComponents: [.date, .hourAndMinute])
+                            .datePickerStyle(.compact)
+                            .padding()
+                            .background(Color(UIColor.systemGray5))
+                            .cornerRadius(10)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
+                    }
+
                     Spacer()
 
                     // Save & Cancel Buttons
@@ -56,14 +84,7 @@ struct CreateTaskView: View {
                 }
                 .padding(.horizontal)
             }
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            )
+            .background(Color.background(for: colorScheme))
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -81,14 +102,39 @@ struct CreateTaskView: View {
             taskToSave.isCompleted = false
         }
 
+        // Standard fields
         taskToSave.title = title
         taskToSave.taskDescription = description
         taskToSave.dueDate = dueDate
         taskToSave.priority = priority
 
+        // New fields for reminders (assuming your Task entity has them)
+        taskToSave.hasReminder = hasReminder
+        taskToSave.reminderDate = hasReminder ? reminderDate : nil
+
         do {
+            // Save the context
             try viewContext.save()
             needsRefresh.toggle()
+
+            // Now schedule or cancel notifications
+            let notificationID = taskToSave.id?.uuidString ?? ""
+
+            if hasReminder, let date = taskToSave.reminderDate, notificationsEnabled {
+                // Cancel any old one first (avoid duplicates)
+                NotificationManager.shared.cancelNotification(id: notificationID)
+                // Then schedule a new one
+                NotificationManager.shared.scheduleNotification(
+                    id: notificationID,
+                    title: "Task Reminder",
+                    body: "“\(title)” is coming up!",
+                    date: date
+                )
+            } else {
+                // Otherwise, cancel any existing notification
+                NotificationManager.shared.cancelNotification(id: notificationID)
+            }
+
             dismiss()
         } catch {
             print("❌ Error saving task: \(error.localizedDescription)")
@@ -101,6 +147,7 @@ struct CreateTaskView: View {
 struct TaskInputField: View {
     let title: String
     @Binding var text: String
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -110,13 +157,14 @@ struct TaskInputField: View {
                 .padding()
                 .background(Color(UIColor.systemGray5))
                 .cornerRadius(10)
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
         }
     }
 }
 
 struct DueDatePicker: View {
     @Binding var dueDate: Date
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -129,7 +177,7 @@ struct DueDatePicker: View {
                     .padding()
                     .background(Color(UIColor.systemGray5))
                     .cornerRadius(10)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                 Spacer()
             }
         }
@@ -138,6 +186,7 @@ struct DueDatePicker: View {
 
 struct PrioritySelector: View {
     @Binding var priority: String
+    @Environment(\.colorScheme) var colorScheme
     let priorities: [String]
 
     var body: some View {
@@ -151,8 +200,8 @@ struct PrioritySelector: View {
                     }) {
                         Text(priorityOption)
                             .fontWeight(.thin)
-                            .foregroundColor(.white)
-                            .opacity(priority == priorityOption ? 1.0 : 0.6)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
+                            .opacity(priority == priorityOption ? 1.0 : 0.1)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 16)
                             .background(priorityColor(priorityOption))
@@ -165,6 +214,7 @@ struct PrioritySelector: View {
 }
 
 struct CancelButton: View {
+    @Environment(\.colorScheme) var colorScheme
     let action: () -> Void
 
     var body: some View {
@@ -173,13 +223,14 @@ struct CancelButton: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color(UIColor.systemGray4))
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
                 .cornerRadius(10)
         }
     }
 }
 
 struct SaveButton: View {
+    @Environment(\.colorScheme) var colorScheme
     let action: () -> Void
 
     var body: some View {
@@ -188,7 +239,7 @@ struct SaveButton: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.blue)
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
                 .cornerRadius(10)
         }
     }

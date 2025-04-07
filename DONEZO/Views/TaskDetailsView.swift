@@ -4,18 +4,15 @@ import CoreData
 struct TaskDetailsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
 
     let task: Task
     @Binding var needsRefresh: Bool
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Color.background(for: colorScheme)
+                .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 20) {
                 
@@ -23,21 +20,21 @@ struct TaskDetailsView: View {
                 Text("Task Details")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                 
                 // Task Name
                 Text(task.title ?? "Untitled Task")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                     .padding(.bottom, 5)
                 
                 // Due Date
                 HStack {
                     Image(systemName: "calendar")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
                     Text("Due: \((task.dueDate ?? Date()).formatted(date: .long, time: .omitted))")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
                 }
                 
                 // Priority Badge
@@ -46,16 +43,16 @@ struct TaskDetailsView: View {
                     .padding()
                     .background(priorityColor(task.priority ?? "Unknown"))
                     .cornerRadius(10)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                 
                 // Description Section
                 Text("Description")
                     .font(.headline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color.secondaryText(for: colorScheme))
                 
                 Text(task.taskDescription ?? "No description provided.")
                     .font(.body)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                     .padding()
                     .background(Color.white.opacity(0.1))
                     .cornerRadius(10)
@@ -69,7 +66,7 @@ struct TaskDetailsView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color(UIColor.systemGray4))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
                             .cornerRadius(10)
                     }
                     
@@ -80,7 +77,7 @@ struct TaskDetailsView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.red)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
                             .cornerRadius(10)
                     }
                 }

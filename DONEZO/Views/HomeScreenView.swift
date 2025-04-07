@@ -7,6 +7,7 @@ struct HomeScreenView: View {
     @State private var needsRefresh: Bool = false
     @State private var refreshID = UUID()
     @State private var violinTilt: Double = -10
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -50,19 +51,14 @@ struct HomeScreenView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.black, Color(red: 18/255, green: 18/255, blue: 18/255)]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-
+                Color.background(for: colorScheme)
+                    .ignoresSafeArea()
                 VStack {
                     HStack {
                         Text("Your Tasks")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
 
                         Spacer()
 
@@ -70,7 +66,7 @@ struct HomeScreenView: View {
                             Image(systemName: "gearshape.fill")
                                 .resizable()
                                 .frame(width: 24, height: 24)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color.secondaryText(for: colorScheme))
                         }
                     }
 
@@ -112,11 +108,11 @@ struct HomeScreenView: View {
 
                                 Text("The world's smallest violin is playing for your empty task list...")
                                     .font(.headline)
-                                    .foregroundColor(.gray.opacity(0.8))
+                                    .foregroundColor(Color.secondaryText(for: colorScheme).opacity(0.8))
 
                                 Text("Tap the + to give it something to play for.")
                                     .font(.subheadline)
-                                    .foregroundColor(.gray.opacity(0.6))
+                                    .foregroundColor(Color.secondaryText(for: colorScheme).opacity(0.8))
                             }
                             .padding()
                         } else {
@@ -139,11 +135,11 @@ struct HomeScreenView: View {
                         Image(systemName: "plus")
                             .resizable()
                             .frame(width: 30, height: 30)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primaryText(for: colorScheme))
                             .padding()
                             .background(Circle().fill(Color.white.opacity(0.2)))
                             .overlay(
-                                Circle().stroke(Color.white, lineWidth: 1)
+                                Circle().stroke(Color.primaryText(for: colorScheme), lineWidth: 1)
                             )
                     }
                     .padding(.bottom, 20)
@@ -167,6 +163,7 @@ struct TaskRow: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var task: Task
     @State private var isCompleted: Bool
+    @Environment(\.colorScheme) var colorScheme
 
     init(task: Task) {
         self.task = task
@@ -184,13 +181,13 @@ struct TaskRow: View {
             VStack(alignment: .leading) {
                 Text(task.title ?? "Untitled Task")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primaryText(for: colorScheme))
                     .strikethrough(isCompleted, color: .white)
 
                 if let dueDate = task.dueDate {
                     Text("Due: \(dueDate.formatted(date: .long, time: .omitted))")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
 
                     if dueDate < Date() {
                         Text("Overdue")
@@ -201,7 +198,7 @@ struct TaskRow: View {
                 } else {
                     Text("No due date")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondaryText(for: colorScheme))
                 }
             }
 
@@ -211,14 +208,14 @@ struct TaskRow: View {
                 .font(.subheadline)
                 .padding(8)
                 .background(priorityColor(task.priority ?? "Unknown"))
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
                 .cornerRadius(10)
         }
         .padding()
-        .background(Color.clear)
+        .background(Color.card(for: colorScheme))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                .stroke(Color.secondaryText(for: colorScheme).opacity(0.3), lineWidth: 1)
         )
         .padding(.horizontal)
     }
@@ -247,6 +244,8 @@ struct TaskRow: View {
 
 // MARK: - Filter Button View
 struct FilterButton: View {
+    
+    @Environment(\.colorScheme) var colorScheme
     let title: String
     let isActive: Bool
     let action: () -> Void
@@ -255,11 +254,15 @@ struct FilterButton: View {
         Button(action: action) {
             Text(title)
                 .fontWeight(.thin)
-                .foregroundColor(.white)
+                .foregroundColor(Color.primaryText(for: colorScheme))
                 .opacity(isActive ? 1.0 : 0.6)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
-                .background(Color.white.opacity(isActive ? 0.3 : 0.1))
+                .background(
+                    isActive
+                    ? Color.primaryText(for: colorScheme).opacity(0.2)
+                    : Color.secondaryText(for: colorScheme).opacity(0.1)
+                )
                 .cornerRadius(20)
                 .animation(.easeInOut(duration: 0.2), value: isActive)
         }
